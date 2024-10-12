@@ -12,7 +12,7 @@ export class AuthService {
   async signIn(
     email: string,
     pass: string,
-  ): Promise<{ access_token: string }> {
+  ): Promise<{ access_token: string , user_data: { id: number, email: string, role: string } }> {
     const user = await this.usersService.findOneByEmail(email);
     const bcrypt = require('bcrypt');
 
@@ -27,6 +27,11 @@ export class AuthService {
       role: user.role
     };
     return {
+      user_data: {
+        id: user.id,
+        email: user.email,
+        role: user.role
+      },
       access_token: await this.jwtService.signAsync(payload),
     };
   }
