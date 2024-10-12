@@ -1,0 +1,61 @@
+services:
+  # nestjs-app:
+  #   build:
+  #     context: ./backend
+  #     dockerfile: Dockerfile
+  #   container_name: nestjs-app
+  #   ports:
+  #     - '3000:3000' 
+  #   volumes:
+  #     - ./backend:/app 
+  #     - /app/node_modules 
+  #   depends_on:
+  #     - redis
+  #     - postgres
+  #   environment:
+  #     DATABASE_URL: postgres://postgres:postgres@postgres:5432/nestdb
+  #     REDIS_HOST: redis
+  #     REDIS_PORT: 6379
+  #     RATE_LIMIT: 10
+  #     RATE_LIMIT_TTL: 1000
+  #   env_file:
+  #     - ./abckend/.env
+  #   restart: always
+
+  # redis:
+  #   image: redis:latest
+  #   container_name: redis
+  #   ports:
+  #     - '6379:6379'
+  #   restart: always
+
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: nestdb
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    restart: always
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin
+    ports:
+      - '8081:80'
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_CONFIG_WTF_CSRF_ENABLED: 'False'
+      PGADMIN_CONFIG_ENHANCED_COOKIE_PROTECTION: 'False'
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    restart: always
+
+volumes:
+  postgres-data:
+  pgadmin-data:
