@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Button } from "@/components/ui/button"
 import { apiCall } from '@/api/api'
+import LogoutButton from '@/components/LogoutButton'
 
 interface Message {
   id: number
@@ -59,7 +60,11 @@ export default function MessageDisplay() {
 
   return (
     <div className="container mx-auto p-4 max-w-4xl">
-      <h1 className="text-2xl font-bold mb-4">Messages</h1>
+      <div className="flex flex-row items-center justify-between">
+        <h1 className="text-2xl font-bold mb-4">Messages</h1>
+        <LogoutButton/>
+      </div>
+
       <div className="grid md:grid-cols-2 gap-4">
         <Card className="md:col-span-1">
           <CardHeader>

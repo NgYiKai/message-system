@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label"
 import { toast } from '@/hooks/use-toast'
 import { MultiSelect } from '@/components/multiselect'
 import { apiCall } from '@/api/api'
+import LogoutButton from '@/components/LogoutButton'
 
 interface User {
   id: string,
@@ -107,8 +108,9 @@ export default function AdminMessageSender() {
   return (
     <div className="container mx-auto p-4 max-w-2xl">
       <Card>
-        <CardHeader>
+      <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="text-2xl font-bold">Send Message</CardTitle>
+          <LogoutButton />
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
