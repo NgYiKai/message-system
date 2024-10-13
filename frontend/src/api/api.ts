@@ -1,4 +1,4 @@
-export async function apiCall(path: string, method: string, data: any = null) {
+export async function apiCall(path: string, method: string, data:unknown = null) {
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/${path}`, {
         method: method,
         headers: {

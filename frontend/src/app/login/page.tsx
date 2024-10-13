@@ -57,6 +57,7 @@ export default function LoginPage() {
           await apiCall('users', 'POST', { email, password })
           setSuccess('Registration successful! You can now log in.')
         } catch (err) {
+          console.error('Registration error:', err)
           setError('Registration failed. Please try again.')
         }
     }

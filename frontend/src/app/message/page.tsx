@@ -16,14 +16,9 @@ interface Message {
 export default function MessageDisplay() {
   const [messages, setMessages] = useState<Message[]>([])
   const [selectedMessage, setSelectedMessage] = useState<Message | null>(null)
-  const [userData, setUserData] = useState(null)
   const [userToken, setUserToken] = useState<string | null>(null)
   
   useEffect(() => {
-    const storedData = localStorage.getItem('user_data');
-    const parsedData = storedData ? JSON.parse(storedData) : null;
-    setUserData(parsedData);
-
     const storedToken = localStorage.getItem('user_token');
     setUserToken(storedToken)
   }, [])

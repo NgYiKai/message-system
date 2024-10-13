@@ -76,10 +76,10 @@ export default function AdminMessageSender() {
       return
     }
 
-    let target = sendToAll ? ["all"] : selectedUsers
+    const target = sendToAll ? ["all"] : selectedUsers
 
     try {
-      const response = await apiCall('message', 'POST', {
+      await apiCall('message', 'POST', {
         target: target,
         title: title,
         content: content
