@@ -1,6 +1,3 @@
-<a id="readme-top"></a>
-
-
 <!-- GETTING STARTED -->
 ## Getting Started
 
@@ -14,6 +11,8 @@ This is an example of how to list things you need to use the software and how to
   ```sh
   npm install npm@latest -g
   ```
+* postgresql
+
 * Docker(Optional)
   
 If you prefer using Docker, ensure Docker is installed and running on your machine. You can download it from Docker's official website.
@@ -106,19 +105,17 @@ If you prefer using Docker, ensure Docker is installed and running on your machi
 
 10. Access the app at localhost:3001
    
-   Access with admin account
-   ```
-   email: admin@admin.com
-   password: 123456
-   ```
-
-   Access with user account
-   ```
-   email: user@user.com
-   password: 123456
-   ```
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+     Access with admin account
+     ```
+     email: admin@admin.com
+     password: 123456
+     ```
+  
+     Access with user account
+     ```
+     email: user@user.com
+     password: 123456
+     ```
 
 
 
