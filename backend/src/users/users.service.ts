@@ -17,16 +17,27 @@ export class UsersService {
       throw new ConflictException('User already exists');
     }
 
+    const bcrypt = require('bcrypt');
+    let hashedPassword = await bcrypt.hash(createUserDto.password, 10)
+
     return this.prisma.user.create({
       data: {
         ...createUserDto,
+        password: hashedPassword,
         role:"user"
       },
     });
   }
 
-  findAll() {
-    return this.prisma.user.findMany();
+  async findAll() {
+    const users = (await this.prisma.user.findMany()).filter(
+      ({role}) => (role !== 'admin')
+    ).map(
+      ({password,...user}) => ({ ...user })
+    );
+
+
+    return users
   }
 
   findOne(id: number) {

@@ -2,20 +2,23 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req } fro
 import { MessageService } from './message.service';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
+import { RolesGuard } from 'src/auth/role.guard';
+import { Roles } from 'src/auth/roles.decorator';
 
 @Controller('message')
 @UseGuards(AuthGuard)
 export class MessageController {
-  constructor(private readonly messageService: MessageService) {}
+  constructor(private readonly messageService: MessageService) { }
 
   @Post()
+  @UseGuards(RolesGuard)
+  @Roles(['admin'])
   create(@Body() createMessageDto: CreateMessageDto) {
     return this.messageService.create(createMessageDto);
   }
 
   @Get()
   findAll(@Req() request: Request) {
-    console.log(request['user']);
     return this.messageService.findAll(request['user'].id);
   }
 
