@@ -1,33 +1,40 @@
 services:
-  # nestjs-app:
-  #   build:
-  #     context: ./backend
-  #     dockerfile: Dockerfile
-  #   container_name: nestjs-app
-  #   ports:
-  #     - '3000:3000' 
-  #   volumes:
-  #     - ./backend:/app 
-  #     - /app/node_modules 
-  #   depends_on:
-  #     - redis
-  #     - postgres
-  #   environment:
-  #     DATABASE_URL: postgres://postgres:postgres@postgres:5432/nestdb
-  #     REDIS_HOST: redis
-  #     REDIS_PORT: 6379
-  #     RATE_LIMIT: 10
-  #     RATE_LIMIT_TTL: 1000
-  #   env_file:
-  #     - ./abckend/.env
-  #   restart: always
-
-  # redis:
-  #   image: redis:latest
-  #   container_name: redis
-  #   ports:
-  #     - '6379:6379'
-  #   restart: always
+  nestjs-app:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: nestjs-app
+    ports:
+      - '3000:3000' 
+    volumes:
+      - ./backend:/app 
+      - /app/node_modules 
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/nestdb
+    env_file:
+      - ./backend/.env
+    restart: always
+  
+  nextjs-app:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: nextjs-app
+    ports:
+      - '3001:3000' 
+    volumes:
+      - ./frontend:/app 
+      - /app/node_modules 
+    depends_on:
+      - postgres
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:3000
+    env_file:
+      - ./frontend/.env
+    restart: always
+  
 
   postgres:
     image: postgres:latest
