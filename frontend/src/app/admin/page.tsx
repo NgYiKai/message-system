@@ -1,35 +1,52 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-// import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { toast } from '@/hooks/use-toast'
+import { MultiSelect } from '@/components/multiselect'
+import { apiCall } from '@/api/api'
 
-const users = [
-  { id: '1', name: 'Alice Johnson' },
-  { id: '2', name: 'Bob Smith' },
-  { id: '3', name: 'Charlie Brown' },
-  { id: '4', name: 'Diana Ross' },
-]
+interface User {
+  id: string,
+  email: string,
+  role: string,
+}
 
 export default function AdminMessageSender() {
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
   const [selectedUsers, setSelectedUsers] = useState<string[]>([])
+  const [userList, setUserList] = useState([])
   const [sendToAll, setSendToAll] = useState(false)
+  const [userToken, setUserToken] = useState<string | null>(null)
 
-  const handleUserSelect = (userId: string) => {
-    setSelectedUsers(prev => 
-      prev.includes(userId) 
-        ? prev.filter(id => id !== userId)
-        : [...prev, userId]
-    )
-  }
+  useEffect(() => {
+    const storedToken = localStorage.getItem('user_token');
+    setUserToken(storedToken)
+  }, [])
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        let result = await apiCall('users', 'GET');
+        result = result.map(
+          (user: User) => ({ value: user.id, label: user.email })
+        )
+        setUserList(result)
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    }
+
+    if (userToken) {
+      fetchData()
+    }
+  }, [userToken]);
 
   const handleSendToAllChange = (checked: boolean) => {
     setSendToAll(checked)
@@ -40,8 +57,7 @@ export default function AdminMessageSender() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
-    // Validation
+
     if (!title.trim() || !content.trim()) {
       toast({
         title: "Error",
@@ -60,13 +76,13 @@ export default function AdminMessageSender() {
       return
     }
 
+    let target = sendToAll ? ["all"] : selectedUsers
+
     try {
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
-      console.log('Sending message:', {
-        title,
-        content,
-        recipients: sendToAll ? 'All Users' : selectedUsers,
+      const response = await apiCall('message', 'POST', {
+        target: target,
+        title: title,
+        content: content
       })
 
       toast({
@@ -74,12 +90,12 @@ export default function AdminMessageSender() {
         description: "Message sent successfully!",
       })
 
-      // Reset form
       setTitle('')
       setContent('')
       setSelectedUsers([])
-      setSendToAll(false)
+      setSendToAll(true)
     } catch (error) {
+      console.log(error)
       toast({
         title: "Error",
         description: "Failed to send message. Please try again.",
@@ -92,7 +108,7 @@ export default function AdminMessageSender() {
     <div className="container mx-auto p-4 max-w-2xl">
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl font-bold">Send Admin Message</CardTitle>
+          <CardTitle className="text-2xl font-bold">Send Message</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -119,40 +135,28 @@ export default function AdminMessageSender() {
             </div>
             <div className="space-y-2">
               <Label className="flex items-center space-x-2">
-                <Checkbox 
-                  id="sendToAll" 
+                <Checkbox
+                  id="sendToAll"
                   checked={sendToAll}
                   onCheckedChange={handleSendToAllChange}
                 />
                 <span>Send to all users</span>
               </Label>
             </div>
-            {/* {!sendToAll && (
-              <div className="space-y-2">
-                <Label>Select Users</Label>
-                <Select>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select users" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {users.map((user) => (
-                      <SelectItem key={user.id} value={user.id}>
-                        <Label className="flex items-center space-x-2">
-                          <Checkbox 
-                            checked={selectedUsers.includes(user.id)}
-                            onCheckedChange={() => handleUserSelect(user.id)}
-                          />
-                          <span>{user.name}</span>
-                        </Label>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <p className="text-sm text-muted-foreground">
-                  Selected: {selectedUsers.length} user(s)
-                </p>
-              </div>
-            )} */}
+
+            {
+              !sendToAll && (
+                <MultiSelect
+                  options={userList}
+                  onValueChange={setSelectedUsers}
+                  defaultValue={selectedUsers}
+                  placeholder="Select users"
+                  variant="inverted"
+                  maxCount={3}
+                />
+              )
+            }
+
             <Button type="submit" className="w-full">
               Send Message
             </Button>

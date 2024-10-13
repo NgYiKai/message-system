@@ -1,36 +1,60 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Button } from "@/components/ui/button"
+import { apiCall } from '@/api/api'
 
 interface Message {
   id: number
   title: string
   content: string
-  read: boolean
+  isRead: boolean
 }
 
-// Sample data - replace this with your actual data fetching logic
-const initialMessages: Message[] = [
-  { id: 1, title: "Welcome Message", content: "Welcome to our platform!", read: true },
-  { id: 2, title: "New Feature Announcement", content: "We've added a new feature...", read: false },
-  { id: 3, title: "Important Update", content: "Please update your account details...", read: false },
-  { id: 4, title: "Maintenance Notice", content: "Our servers will be down for maintenance...", read: true },
-]
-
 export default function MessageDisplay() {
-  const [messages, setMessages] = useState<Message[]>(initialMessages)
+  const [messages, setMessages] = useState<Message[]>([])
   const [selectedMessage, setSelectedMessage] = useState<Message | null>(null)
+  const [userData, setUserData] = useState(null)
+  const [userToken, setUserToken] = useState<string | null>(null)
+  
+  useEffect(() => {
+    const storedData = localStorage.getItem('user_data');
+    const parsedData = storedData ? JSON.parse(storedData) : null;
+    setUserData(parsedData);
 
-  const handleMessageClick = (message: Message) => {
+    const storedToken = localStorage.getItem('user_token');
+    setUserToken(storedToken)
+  }, [])
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const result = await apiCall('message', 'GET'); 
+        setMessages(result);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    }
+    
+    if (userToken) {
+      fetchData()
+    }
+  }, [userToken]);  
+
+  const handleMessageClick = async (message: Message) => {
     setSelectedMessage(message)
-    if (!message.read) {
-      // Mark the message as read
-      setMessages(messages.map(m => 
-        m.id === message.id ? { ...m, read: true } : m
+    if (!message.isRead) {
+      setMessages(messages.map(m =>
+        m.id === message.id ? { ...m, isRead: true } : m
       ))
+
+      try {
+        await apiCall(`message/${message.id}`, 'PATCH');
+      } catch (error) {
+        console.error('Error updating message status:', error);
+      }
     }
   }
 
@@ -51,14 +75,13 @@ export default function MessageDisplay() {
               {messages.map((message) => (
                 <div
                   key={message.id}
-                  className={`p-2 mb-2 rounded cursor-pointer transition-colors ${
-                    message.read ? 'bg-gray-100 hover:bg-gray-200' : 'bg-blue-100 hover:bg-blue-200'
-                  }`}
+                  className={`p-2 mb-2 rounded cursor-pointer transition-colors ${message.isRead ? 'bg-gray-100 hover:bg-gray-200' : 'bg-blue-100 hover:bg-blue-200'
+                    }`}
                   onClick={() => handleMessageClick(message)}
                 >
                   <h3 className="font-semibold">{message.title}</h3>
                   <p className="text-sm text-gray-500">
-                    {message.read ? 'Read' : 'Unread'}
+                    {message.isRead ? 'Read' : 'Unread'}
                   </p>
                 </div>
               ))}
